@@ -19,229 +19,326 @@
 package com.datastrato.gravitino.authorization;
 
 import java.util.Objects;
+import java.lang.reflect.Method;
+import java.util.HashMap;
+import java.util.Map;
 
 /** The helper class for {@link Privilege}. */
 public class Privileges {
 
+  // /**
+  //  * Returns the Privilege with allow condition from the string representation.
+  //  *
+  //  * @param privilege The string representation of the privilege.
+  //  * @return The Privilege.
+  //  */
+  // public static Privilege allow(String privilege) {
+  //   Privilege.Name name = Privilege.Name.valueOf(privilege);
+  //   return allow(name);
+  // }
+
+  // /**
+  //  * Returns the Privilege with allow condition from the `Privilege.Name`.
+  //  *
+  //  * @param name The `Privilege.Name` of the privilege.
+  //  * @return The Privilege.
+  //  */
+  // public static Privilege allow(Privilege.Name name) {
+  //   switch (name) {
+  //       // Catalog
+  //     case CREATE_CATALOG:
+  //       return CreateCatalog.allow();
+  //     case DROP_CATALOG:
+  //       return DropCatalog.allow();
+  //     case ALTER_CATALOG:
+  //       return AlterCatalog.allow();
+  //     case USE_CATALOG:
+  //       return UseCatalog.allow();
+
+  //       // Schema
+  //     case CREATE_SCHEMA:
+  //       return CreateSchema.allow();
+  //     case DROP_SCHEMA:
+  //       return DropSchema.allow();
+  //     case ALTER_SCHEMA:
+  //       return AlterSchema.allow();
+  //     case USE_SCHEMA:
+  //       return UseSchema.allow();
+
+  //       // Table
+  //     case CREATE_TABLE:
+  //       return CreateTable.allow();
+  //     case DROP_TABLE:
+  //       return DropTable.allow();
+  //     case WRITE_TABLE:
+  //       return WriteTable.allow();
+  //     case READ_TABLE:
+  //       return ReadTable.allow();
+
+  //       // Fileset
+  //     case CREATE_FILESET:
+  //       return CreateFileset.allow();
+  //     case DROP_FILESET:
+  //       return DropFileset.allow();
+  //     case WRITE_FILESET:
+  //       return WriteFileset.allow();
+  //     case READ_FILESET:
+  //       return ReadFileset.allow();
+
+  //       // Topic
+  //     case CREATE_TOPIC:
+  //       return CreateTopic.allow();
+  //     case DROP_TOPIC:
+  //       return DropTopic.allow();
+  //     case WRITE_TOPIC:
+  //       return WriteTopic.allow();
+  //     case READ_TOPIC:
+  //       return ReadTopic.allow();
+
+  //       // Metalake
+  //     case CREATE_METALAKE:
+  //       return CreateMetalake.allow();
+  //     case MANAGE_METALAKE:
+  //       return ManageMetalake.allow();
+  //     case USE_METALAKE:
+  //       return UseMetalake.allow();
+
+  //       // User
+  //     case ADD_USER:
+  //       return AddUser.allow();
+  //     case REMOVE_USER:
+  //       return RemoveUser.allow();
+  //     case GET_USER:
+  //       return GetUser.allow();
+
+  //       // Group
+  //     case ADD_GROUP:
+  //       return AddGroup.allow();
+  //     case REMOVE_GROUP:
+  //       return RemoveGroup.allow();
+  //     case GET_GROUP:
+  //       return GetGroup.allow();
+
+  //       // Role
+  //     case CREATE_ROLE:
+  //       return CreateRole.allow();
+  //     case DELETE_ROLE:
+  //       return DeleteRole.allow();
+  //     case GRANT_ROLE:
+  //       return GrantRole.allow();
+  //     case REVOKE_ROLE:
+  //       return RevokeRole.allow();
+  //     case GET_ROLE:
+  //       return GetRole.allow();
+
+  //     default:
+  //       throw new IllegalArgumentException("Doesn't support the privilege: " + name);
+  //   }
+  // }
+
+  // /**
+  //  * Returns the Privilege with deny condition from the string representation.
+  //  *
+  //  * @param privilege The string representation of the privilege.
+  //  * @return The Privilege.
+  //  */
+  // public static Privilege deny(String privilege) {
+  //   Privilege.Name name = Privilege.Name.valueOf(privilege);
+  //   return deny(name);
+  // }
+
+  // /**
+  //  * Returns the Privilege with deny condition from the `Privilege.Name`.
+  //  *
+  //  * @param name The `Privilege.Name` of the privilege.
+  //  * @return The Privilege.
+  //  */
+  // public static Privilege deny(Privilege.Name name) {
+  //   switch (name) {
+  //       // Catalog
+  //     case CREATE_CATALOG:
+  //       return CreateCatalog.deny();
+  //     case DROP_CATALOG:
+  //       return DropCatalog.deny();
+  //     case ALTER_CATALOG:
+  //       return AlterCatalog.deny();
+  //     case USE_CATALOG:
+  //       return UseCatalog.deny();
+
+  //       // Schema
+  //     case CREATE_SCHEMA:
+  //       return CreateSchema.deny();
+  //     case DROP_SCHEMA:
+  //       return DropSchema.deny();
+  //     case ALTER_SCHEMA:
+  //       return AlterSchema.deny();
+  //     case USE_SCHEMA:
+  //       return UseSchema.deny();
+
+  //       // Table
+  //     case CREATE_TABLE:
+  //       return CreateTable.deny();
+  //     case DROP_TABLE:
+  //       return DropTable.deny();
+  //     case WRITE_TABLE:
+  //       return WriteTable.deny();
+  //     case READ_TABLE:
+  //       return ReadTable.deny();
+
+  //       // Fileset
+  //     case CREATE_FILESET:
+  //       return CreateFileset.deny();
+  //     case DROP_FILESET:
+  //       return DropFileset.deny();
+  //     case WRITE_FILESET:
+  //       return WriteFileset.deny();
+  //     case READ_FILESET:
+  //       return ReadFileset.deny();
+
+  //       // Topic
+  //     case CREATE_TOPIC:
+  //       return CreateTopic.deny();
+  //     case DROP_TOPIC:
+  //       return DropTopic.deny();
+  //     case WRITE_TOPIC:
+  //       return WriteTopic.deny();
+  //     case READ_TOPIC:
+  //       return ReadTopic.deny();
+
+  //       // Metalake
+  //     case CREATE_METALAKE:
+  //       return CreateMetalake.deny();
+  //     case MANAGE_METALAKE:
+  //       return ManageMetalake.deny();
+  //     case USE_METALAKE:
+  //       return UseMetalake.deny();
+
+  //       // User
+  //     case ADD_USER:
+  //       return AddUser.deny();
+  //     case REMOVE_USER:
+  //       return RemoveUser.deny();
+  //     case GET_USER:
+  //       return GetUser.deny();
+
+  //       // Group
+  //     case ADD_GROUP:
+  //       return AddGroup.deny();
+  //     case REMOVE_GROUP:
+  //       return RemoveGroup.deny();
+  //     case GET_GROUP:
+  //       return GetGroup.deny();
+
+  //       // Role
+  //     case CREATE_ROLE:
+  //       return CreateRole.deny();
+  //     case DELETE_ROLE:
+  //       return DeleteRole.deny();
+  //     case GRANT_ROLE:
+  //       return GrantRole.deny();
+  //     case REVOKE_ROLE:
+  //       return RevokeRole.deny();
+  //     case GET_ROLE:
+  //       return GetRole.deny();
+
+  //     default:
+  //       throw new IllegalArgumentException("Doesn't support the privilege: " + name);
+  //   }
+  // }
+
   /**
-   * Returns the Privilege with allow condition from the string representation.
-   *
-   * @param privilege The string representation of the privilege.
-   * @return The Privilege.
+   * Represents the condition of a privilege
    */
-  public static Privilege allow(String privilege) {
-    Privilege.Name name = Privilege.Name.valueOf(privilege);
+  public enum Condition {
+    ALLOW, DENY
+  }
+
+  /**
+   * Represents the name of privilege
+   */
+  public enum Name {
+    CREATE_CATALOG,
+    DROP_CATALOG,
+    ALTER_CATALOG,
+    USE_CATALOG,
+    CREATE_SCHEMA,
+    DROP_SCHEMA,
+    ALTER_SCHEMA,
+    USE_SCHEMA,
+    CREATE_TABLE,
+    DROP_TABLE,
+    WRITE_TABLE,
+    READ_TABLE,
+    CREATE_FILESET,
+    DROP_FILESET,
+    WRITE_FILESET,
+    READ_FILESET,
+    CREATE_TOPIC,
+    DROP_TOPIC,
+    WRITE_TOPIC,
+    READ_TOPIC,
+    CREATE_METALAKE,
+    MANAGE_METALAKE,
+    USE_METALAKE,
+    ADD_USER,
+    REMOVE_USER,
+    GET_USER,
+    ADD_GROUP,
+    REMOVE_GROUP,
+    GET_GROUP,
+    CREATE_ROLE,
+    DELETE_ROLE,
+    GRANT_ROLE,
+    REVOKE_ROLE,
+    GET_ROLE
+}
+
+private static final Map<Name, GenericPrivilege<?>> allowMap = new HashMap<>();
+private static final Map<Name, GenericPrivilege<?>> denyMap = new HashMap<>();
+
+static {
+    for (Name name : Name.values()) {
+        try {
+            Class<?> clazz = Class.forName(name.name().substring(0, 1).toUpperCase() + name.name().substring(1).toLowerCase() + "Catalog"); // Adjust the suffix for different types
+            Method allowMethod = clazz.getMethod("allow");
+            Method denyMethod = clazz.getMethod("deny");
+            allowMap.put(name, (GenericPrivilege<?>) allowMethod.invoke(null));
+            denyMap.put(name, (GenericPrivilege<?>) denyMethod.invoke(null));
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to initialize privileges", e);
+        }
+    }
+}
+
+/**
+ * Returns the Privilege with allow condition from the string representation.
+ *
+ * @param privilege The string representation of the privilege.
+ * @return The Privilege.
+ */
+public static Privilege allow(String privilege) {
+    Name name = Name.valueOf(privilege);
     return allow(name);
-  }
+}
 
-  /**
-   * Returns the Privilege with allow condition from the `Privilege.Name`.
-   *
-   * @param name The `Privilege.Name` of the privilege.
-   * @return The Privilege.
-   */
-  public static Privilege allow(Privilege.Name name) {
-    switch (name) {
-        // Catalog
-      case CREATE_CATALOG:
-        return CreateCatalog.allow();
-      case DROP_CATALOG:
-        return DropCatalog.allow();
-      case ALTER_CATALOG:
-        return AlterCatalog.allow();
-      case USE_CATALOG:
-        return UseCatalog.allow();
+public static Privilege allow(Name name) {
+    return allowMap.get(name);
+}
 
-        // Schema
-      case CREATE_SCHEMA:
-        return CreateSchema.allow();
-      case DROP_SCHEMA:
-        return DropSchema.allow();
-      case ALTER_SCHEMA:
-        return AlterSchema.allow();
-      case USE_SCHEMA:
-        return UseSchema.allow();
-
-        // Table
-      case CREATE_TABLE:
-        return CreateTable.allow();
-      case DROP_TABLE:
-        return DropTable.allow();
-      case WRITE_TABLE:
-        return WriteTable.allow();
-      case READ_TABLE:
-        return ReadTable.allow();
-
-        // Fileset
-      case CREATE_FILESET:
-        return CreateFileset.allow();
-      case DROP_FILESET:
-        return DropFileset.allow();
-      case WRITE_FILESET:
-        return WriteFileset.allow();
-      case READ_FILESET:
-        return ReadFileset.allow();
-
-        // Topic
-      case CREATE_TOPIC:
-        return CreateTopic.allow();
-      case DROP_TOPIC:
-        return DropTopic.allow();
-      case WRITE_TOPIC:
-        return WriteTopic.allow();
-      case READ_TOPIC:
-        return ReadTopic.allow();
-
-        // Metalake
-      case CREATE_METALAKE:
-        return CreateMetalake.allow();
-      case MANAGE_METALAKE:
-        return ManageMetalake.allow();
-      case USE_METALAKE:
-        return UseMetalake.allow();
-
-        // User
-      case ADD_USER:
-        return AddUser.allow();
-      case REMOVE_USER:
-        return RemoveUser.allow();
-      case GET_USER:
-        return GetUser.allow();
-
-        // Group
-      case ADD_GROUP:
-        return AddGroup.allow();
-      case REMOVE_GROUP:
-        return RemoveGroup.allow();
-      case GET_GROUP:
-        return GetGroup.allow();
-
-        // Role
-      case CREATE_ROLE:
-        return CreateRole.allow();
-      case DELETE_ROLE:
-        return DeleteRole.allow();
-      case GRANT_ROLE:
-        return GrantRole.allow();
-      case REVOKE_ROLE:
-        return RevokeRole.allow();
-      case GET_ROLE:
-        return GetRole.allow();
-
-      default:
-        throw new IllegalArgumentException("Doesn't support the privilege: " + name);
-    }
-  }
-
-  /**
-   * Returns the Privilege with deny condition from the string representation.
-   *
-   * @param privilege The string representation of the privilege.
-   * @return The Privilege.
-   */
-  public static Privilege deny(String privilege) {
-    Privilege.Name name = Privilege.Name.valueOf(privilege);
+/**
+ * Returns the Privilege with deny condition from the string representation.
+ *
+ * @param privilege The string representation of the privilege.
+ * @return The Privilege.
+ */
+public static Privilege deny(String privilege) {
+    Name name = Name.valueOf(privilege);
     return deny(name);
-  }
+}
 
-  /**
-   * Returns the Privilege with deny condition from the `Privilege.Name`.
-   *
-   * @param name The `Privilege.Name` of the privilege.
-   * @return The Privilege.
-   */
-  public static Privilege deny(Privilege.Name name) {
-    switch (name) {
-        // Catalog
-      case CREATE_CATALOG:
-        return CreateCatalog.deny();
-      case DROP_CATALOG:
-        return DropCatalog.deny();
-      case ALTER_CATALOG:
-        return AlterCatalog.deny();
-      case USE_CATALOG:
-        return UseCatalog.deny();
-
-        // Schema
-      case CREATE_SCHEMA:
-        return CreateSchema.deny();
-      case DROP_SCHEMA:
-        return DropSchema.deny();
-      case ALTER_SCHEMA:
-        return AlterSchema.deny();
-      case USE_SCHEMA:
-        return UseSchema.deny();
-
-        // Table
-      case CREATE_TABLE:
-        return CreateTable.deny();
-      case DROP_TABLE:
-        return DropTable.deny();
-      case WRITE_TABLE:
-        return WriteTable.deny();
-      case READ_TABLE:
-        return ReadTable.deny();
-
-        // Fileset
-      case CREATE_FILESET:
-        return CreateFileset.deny();
-      case DROP_FILESET:
-        return DropFileset.deny();
-      case WRITE_FILESET:
-        return WriteFileset.deny();
-      case READ_FILESET:
-        return ReadFileset.deny();
-
-        // Topic
-      case CREATE_TOPIC:
-        return CreateTopic.deny();
-      case DROP_TOPIC:
-        return DropTopic.deny();
-      case WRITE_TOPIC:
-        return WriteTopic.deny();
-      case READ_TOPIC:
-        return ReadTopic.deny();
-
-        // Metalake
-      case CREATE_METALAKE:
-        return CreateMetalake.deny();
-      case MANAGE_METALAKE:
-        return ManageMetalake.deny();
-      case USE_METALAKE:
-        return UseMetalake.deny();
-
-        // User
-      case ADD_USER:
-        return AddUser.deny();
-      case REMOVE_USER:
-        return RemoveUser.deny();
-      case GET_USER:
-        return GetUser.deny();
-
-        // Group
-      case ADD_GROUP:
-        return AddGroup.deny();
-      case REMOVE_GROUP:
-        return RemoveGroup.deny();
-      case GET_GROUP:
-        return GetGroup.deny();
-
-        // Role
-      case CREATE_ROLE:
-        return CreateRole.deny();
-      case DELETE_ROLE:
-        return DeleteRole.deny();
-      case GRANT_ROLE:
-        return GrantRole.deny();
-      case REVOKE_ROLE:
-        return RevokeRole.deny();
-      case GET_ROLE:
-        return GetRole.deny();
-
-      default:
-        throw new IllegalArgumentException("Doesn't support the privilege: " + name);
-    }
-  }
+public static Privilege deny(Name name) {
+    return denyMap.get(name);
+}
 
   /**
    * Abstract class representing a generic privilege.
